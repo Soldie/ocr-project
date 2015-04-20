@@ -3,11 +3,18 @@
  */
 package br.com.deployxtech.ocr;
 
+import java.io.Serializable;
+
 /**
  * @author Francisco Silva
  *
  */
-public class Position {
+public class Position implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private int x;
 	private int y;
@@ -45,14 +52,14 @@ public class Position {
 	}
 	
 	public boolean isSibling(Position position) {
-		return (position.x+1 == x && position.y+1 == y)
-			|| (position.x+1 == x && position.y == y)
-			|| (position.x+1 == x && position.y-1 == y)
-			|| (position.x == x && position.y+1 == y)
-			|| (position.x == x && position.y-1 == y)
-			|| (position.x-1 == x && position.y+1 == y)
-			|| (position.x-1 == x && position.y == y)
-			|| (position.x-1 == x && position.y-1 == y);
+		return (x+1 == position.x && y+1 == position.y)
+			|| (x+1 == position.x && y == position.y)
+			|| (x+1 == position.x && y-1 == position.y)
+			|| (x == position.x && y+1 == position.y)
+			|| (x == position.x && y-1 == position.y)
+			|| (x-1 == position.x && y+1 == position.y)
+			|| (x-1 == position.x && y == position.y)
+			|| (x-1 == position.x && y-1 == position.y);
 	}
 	
 	@Override

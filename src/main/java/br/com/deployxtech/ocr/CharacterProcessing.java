@@ -4,40 +4,252 @@
 package br.com.deployxtech.ocr;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 /**
  * @author francisco
  *
  */
 public class CharacterProcessing {
-	
+ 
+    private static BufferedImage original, grayscale, binarized;
+
 	public final static int WHITE = Color.WHITE.getRGB(), BLACK = Color.BLACK.getRGB();
-	
-	public List<CharacterImage> discover(BufferedImage image) {
+
+	public List<CharacterImage> discover(BufferedImage image) throws IOException {
+		image = processing(image);
+		//image = processing2(image);
+		
 		List<CharacterImage> characters = new ArrayList<CharacterImage>();
 		for (int x = 0; x < image.getWidth(); x++) {
 			for (int y = 0; y < image.getHeight(); y++) {
 				if (WHITE != image.getRGB(x, y)) {
-					boolean isNew = true;
 					Position position = new Position(x, y);
+					CharacterImage fist = null;
+					List<CharacterImage> remove = new ArrayList<CharacterImage>();
 					for (CharacterImage character: characters) {
 						if (character.haveSibling(position)) {
-							character.add(position);
-							isNew = false;
-							break;
+							if (fist == null) {
+								character.add(position);
+								fist = character;
+							}
+							else {
+								fist.add(character);
+								remove.add(character);
+							}
+							//break;
 						}
 					}
-					if (isNew) {
+					characters.removeAll(remove);
+					if (fist == null) {
 						characters.add(new CharacterImage(position));
 					}
 				}
 			}
 		}
+
+		CharacterImage previus = null;
+		List<CharacterImage> remove = new ArrayList<CharacterImage>();
+		for (CharacterImage character: characters) {
+			if (previus != null && !remove.contains(previus)) {
+				if (character.isCompl(previus)) {
+					character.add(previus);
+					remove.add(previus);
+				}
+				else if (previus.isCompl(character)) {
+					previus.add(character);
+					remove.add(character);
+				}
+			}
+			previus = character;
+		}
+		characters.removeAll(remove);
 		return characters;
 	}
+	
+	public static BufferedImage processing(BufferedImage image) throws IOException {
+        grayscale = toGray(image);
+        binarized = binarize(grayscale);
+        //writeImage("output_f");   
+		return binarized;
+	}
+	
+	public static BufferedImage processing2(BufferedImage image) throws IOException {
+		return toBinary(toGrayscale(image), 215);
+	}
 
+	private static BufferedImage toGrayscale(BufferedImage image)  
+			throws IOException {  
+		BufferedImage output = new BufferedImage(image.getWidth(),  
+				image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);  
+		Graphics2D g2d = output.createGraphics();  
+		g2d.drawImage(image, 0, 0, null);  
+		g2d.dispose();  
+		return output;  
+	} 
+
+	private static BufferedImage toBinary(BufferedImage image, int t) {  
+		int BLACK = Color.BLACK.getRGB();  
+		int WHITE = Color.WHITE.getRGB();  
+
+		BufferedImage output = new BufferedImage(image.getWidth(),  
+				image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);  
+
+		// Percorre a imagem definindo na saída o pixel como branco se o valor  
+		// na entrada for menor que o threshold, ou como preto se for maior.  
+		for (int y = 0; y < image.getHeight(); y++)  
+			for (int x = 0; x < image.getWidth(); x++) {  
+				Color pixel = new Color(image.getRGB(x, y));  
+				output.setRGB(x, y, pixel.getRed() < t ? BLACK : WHITE);  
+			}  
+
+		return output;  
+	}
+	
+	private static void writeImage(String output) throws IOException {
+        File file = new File("/home/francisco/Desenvolvimento_de_software/plataformas/java/workspaces/api/ocr-project/test-resource/result-processing/"+output+".png");
+        ImageIO.write(binarized, "jpg", file);
+    }
+ 
+    // Return histogram of grayscale image
+    public static int[] imageHistogram(BufferedImage input) {
+ 
+        int[] histogram = new int[256];
+ 
+        for(int i=0; i<histogram.length; i++) histogram[i] = 0;
+ 
+        for(int i=0; i<input.getWidth(); i++) {
+            for(int j=0; j<input.getHeight(); j++) {
+                int red = new Color(input.getRGB (i, j)).getRed();
+                histogram[red]++;
+            }
+        }
+ 
+        return histogram;
+ 
+    }
+ 
+    // The luminance method
+    private static BufferedImage toGray(BufferedImage original) {
+ 
+        int alpha, red, green, blue;
+        int newPixel;
+ 
+        BufferedImage lum = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+ 
+        for(int i=0; i<original.getWidth(); i++) {
+            for(int j=0; j<original.getHeight(); j++) {
+ 
+                // Get pixels by R, G, B
+                alpha = new Color(original.getRGB(i, j)).getAlpha();
+                red = new Color(original.getRGB(i, j)).getRed();
+                green = new Color(original.getRGB(i, j)).getGreen();
+                blue = new Color(original.getRGB(i, j)).getBlue();
+ 
+                red = (int) (0.21 * red + 0.71 * green + 0.07 * blue);
+                // Return back to original format
+                newPixel = colorToRGB(alpha, red, red, red);
+ 
+                // Write pixels into image
+                lum.setRGB(i, j, newPixel);
+ 
+            }
+        }
+ 
+        return lum;
+ 
+    }
+ 
+    // Get binary treshold using Otsu's method
+    private static int otsuTreshold(BufferedImage original) {
+ 
+        int[] histogram = imageHistogram(original);
+        int total = original.getHeight() * original.getWidth();
+ 
+        float sum = 0;
+        for(int i=0; i<256; i++) sum += i * histogram[i];
+ 
+        float sumB = 0;
+        int wB = 0;
+        int wF = 0;
+ 
+        float varMax = 0;
+        int threshold = 0;
+ 
+        for(int i=0 ; i<256 ; i++) {
+            wB += histogram[i];
+            if(wB == 0) continue;
+            wF = total - wB;
+ 
+            if(wF == 0) break;
+ 
+            sumB += (float) (i * histogram[i]);
+            float mB = sumB / wB;
+            float mF = (sum - sumB) / wF;
+ 
+            float varBetween = (float) wB * (float) wF * (mB - mF) * (mB - mF);
+ 
+            if(varBetween > varMax) {
+                varMax = varBetween;
+                threshold = i;
+            }
+        }
+ 
+        return threshold;
+ 
+    }
+ 
+    private static BufferedImage binarize(BufferedImage original) {
+ 
+        int red;
+        int newPixel;
+ 
+        int threshold = otsuTreshold(original);
+        
+        System.out.printf("threshold: %s\n", threshold);
+ 
+        BufferedImage binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+ 
+        for(int i=0; i<original.getWidth(); i++) {
+            for(int j=0; j<original.getHeight(); j++) {
+ 
+                // Get pixels
+                red = new Color(original.getRGB(i, j)).getRed();
+                int alpha = new Color(original.getRGB(i, j)).getAlpha();
+                if(red > threshold) {
+                    newPixel = 255;
+                }
+                else {
+                    newPixel = 0;
+                }
+                newPixel = colorToRGB(alpha, newPixel, newPixel, newPixel);
+                binarized.setRGB(i, j, newPixel); 
+ 
+            }
+        }
+ 
+        return binarized;
+ 
+    }
+ 
+    // Convert R, G, B, Alpha to standard 8 bit
+    private static int colorToRGB(int alpha, int red, int green, int blue) {
+ 
+        int newPixel = 0;
+        newPixel += alpha;
+        newPixel = newPixel << 8;
+        newPixel += red; newPixel = newPixel << 8;
+        newPixel += green; newPixel = newPixel << 8;
+        newPixel += blue;
+ 
+        return newPixel;
+ 
+    }
 }

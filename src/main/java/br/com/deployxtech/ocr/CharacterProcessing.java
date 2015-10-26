@@ -18,15 +18,15 @@ import javax.imageio.ImageIO;
  *
  */
 public class CharacterProcessing {
- 
-    private static BufferedImage original, grayscale, binarized;
+
+	private static BufferedImage original, grayscale, binarized;
 
 	public final static int WHITE = Color.WHITE.getRGB(), BLACK = Color.BLACK.getRGB();
 
 	public List<CharacterImage> discover(BufferedImage image) throws IOException {
 		image = processing(image);
 		//image = processing2(image);
-		
+
 		List<CharacterImage> characters = new ArrayList<CharacterImage>();
 		for (int x = 0; x < image.getWidth(); x++) {
 			for (int y = 0; y < image.getHeight(); y++) {
@@ -73,14 +73,14 @@ public class CharacterProcessing {
 		characters.removeAll(remove);
 		return characters;
 	}
-	
+
 	public static BufferedImage processing(BufferedImage image) throws IOException {
-        grayscale = toGray(image);
-        binarized = binarize(grayscale);
-        //writeImage("output_f");   
+		grayscale = toGray(image);
+		binarized = binarize(grayscale);
+		//writeImage("output_f");   
 		return binarized;
 	}
-	
+
 	public static BufferedImage processing2(BufferedImage image) throws IOException {
 		return toBinary(toGrayscale(image), 215);
 	}
@@ -112,144 +112,136 @@ public class CharacterProcessing {
 
 		return output;  
 	}
-	
+
 	private static void writeImage(String output) throws IOException {
-        File file = new File("/home/francisco/Desenvolvimento_de_software/plataformas/java/workspaces/api/ocr-project/test-resource/result-processing/"+output+".png");
-        ImageIO.write(binarized, "jpg", file);
-    }
- 
-    // Return histogram of grayscale image
-    public static int[] imageHistogram(BufferedImage input) {
- 
-        int[] histogram = new int[256];
- 
-        for(int i=0; i<histogram.length; i++) histogram[i] = 0;
- 
-        for(int i=0; i<input.getWidth(); i++) {
-            for(int j=0; j<input.getHeight(); j++) {
-                int red = new Color(input.getRGB (i, j)).getRed();
-                histogram[red]++;
-            }
-        }
- 
-        return histogram;
- 
-    }
- 
-    // The luminance method
-    private static BufferedImage toGray(BufferedImage original) {
- 
-        int alpha, red, green, blue;
-        int newPixel;
- 
-        BufferedImage lum = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
- 
-        for(int i=0; i<original.getWidth(); i++) {
-            for(int j=0; j<original.getHeight(); j++) {
- 
-                // Get pixels by R, G, B
-                alpha = new Color(original.getRGB(i, j)).getAlpha();
-                red = new Color(original.getRGB(i, j)).getRed();
-                green = new Color(original.getRGB(i, j)).getGreen();
-                blue = new Color(original.getRGB(i, j)).getBlue();
- 
-                red = (int) (0.21 * red + 0.71 * green + 0.07 * blue);
-                // Return back to original format
-                newPixel = colorToRGB(alpha, red, red, red);
- 
-                // Write pixels into image
-                lum.setRGB(i, j, newPixel);
- 
-            }
-        }
- 
-        return lum;
- 
-    }
- 
-    // Get binary treshold using Otsu's method
-    private static int otsuTreshold(BufferedImage original) {
- 
-        int[] histogram = imageHistogram(original);
-        int total = original.getHeight() * original.getWidth();
- 
-        float sum = 0;
-        for(int i=0; i<256; i++) sum += i * histogram[i];
- 
-        float sumB = 0;
-        int wB = 0;
-        int wF = 0;
- 
-        float varMax = 0;
-        int threshold = 0;
- 
-        for(int i=0 ; i<256 ; i++) {
-            wB += histogram[i];
-            if(wB == 0) continue;
-            wF = total - wB;
- 
-            if(wF == 0) break;
- 
-            sumB += (float) (i * histogram[i]);
-            float mB = sumB / wB;
-            float mF = (sum - sumB) / wF;
- 
-            float varBetween = (float) wB * (float) wF * (mB - mF) * (mB - mF);
- 
-            if(varBetween > varMax) {
-                varMax = varBetween;
-                threshold = i;
-            }
-        }
- 
-        return threshold;
- 
-    }
- 
-    private static BufferedImage binarize(BufferedImage original) {
- 
-        int red;
-        int newPixel;
- 
-        int threshold = otsuTreshold(original);
-        
-        System.out.printf("threshold: %s\n", threshold);
- 
-        BufferedImage binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
- 
-        for(int i=0; i<original.getWidth(); i++) {
-            for(int j=0; j<original.getHeight(); j++) {
- 
-                // Get pixels
-                red = new Color(original.getRGB(i, j)).getRed();
-                int alpha = new Color(original.getRGB(i, j)).getAlpha();
-                if(red > threshold) {
-                    newPixel = 255;
-                }
-                else {
-                    newPixel = 0;
-                }
-                newPixel = colorToRGB(alpha, newPixel, newPixel, newPixel);
-                binarized.setRGB(i, j, newPixel); 
- 
-            }
-        }
- 
-        return binarized;
- 
-    }
- 
-    // Convert R, G, B, Alpha to standard 8 bit
-    private static int colorToRGB(int alpha, int red, int green, int blue) {
- 
-        int newPixel = 0;
-        newPixel += alpha;
-        newPixel = newPixel << 8;
-        newPixel += red; newPixel = newPixel << 8;
-        newPixel += green; newPixel = newPixel << 8;
-        newPixel += blue;
- 
-        return newPixel;
- 
-    }
+		File file = new File("test-resource/result-processing/"+output+".png");
+		ImageIO.write(binarized, "jpg", file);
+	}
+
+	public static int[] imageHistogram(BufferedImage input) {
+
+		int[] histogram = new int[256];
+
+		for(int i=0; i<histogram.length; i++) histogram[i] = 0;
+
+		for(int i=0; i<input.getWidth(); i++) {
+			for(int j=0; j<input.getHeight(); j++) {
+				int red = new Color(input.getRGB (i, j)).getRed();
+				histogram[red]++;
+			}
+		}
+
+		return histogram;
+
+	}
+
+	private static BufferedImage toGray(BufferedImage original) {
+
+		int alpha, red, green, blue;
+		int newPixel;
+
+		BufferedImage lum = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+
+		for(int i=0; i<original.getWidth(); i++) {
+			for(int j=0; j<original.getHeight(); j++) {
+
+				alpha = new Color(original.getRGB(i, j)).getAlpha();
+				red = new Color(original.getRGB(i, j)).getRed();
+				green = new Color(original.getRGB(i, j)).getGreen();
+				blue = new Color(original.getRGB(i, j)).getBlue();
+
+				red = (int) (0.21 * red + 0.71 * green + 0.07 * blue);
+				newPixel = colorToRGB(alpha, red, red, red);
+
+				lum.setRGB(i, j, newPixel);
+
+			}
+		}
+
+		return lum;
+
+	}
+
+	private static int otsuTreshold(BufferedImage original) {
+
+		int[] histogram = imageHistogram(original);
+		int total = original.getHeight() * original.getWidth();
+
+		float sum = 0;
+		for(int i=0; i<256; i++) sum += i * histogram[i];
+
+		float sumB = 0;
+		int wB = 0;
+		int wF = 0;
+
+		float varMax = 0;
+		int threshold = 0;
+
+		for(int i=0 ; i<256 ; i++) {
+			wB += histogram[i];
+			if(wB == 0) continue;
+			wF = total - wB;
+
+			if(wF == 0) break;
+
+			sumB += (float) (i * histogram[i]);
+			float mB = sumB / wB;
+			float mF = (sum - sumB) / wF;
+
+			float varBetween = (float) wB * (float) wF * (mB - mF) * (mB - mF);
+
+			if(varBetween > varMax) {
+				varMax = varBetween;
+				threshold = i;
+			}
+		}
+
+		return threshold;
+
+	}
+
+	private static BufferedImage binarize(BufferedImage original) {
+
+		int red;
+		int newPixel;
+
+		int threshold = otsuTreshold(original);
+
+		System.out.printf("threshold: %s\n", threshold);
+
+		BufferedImage binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+
+		for(int i=0; i<original.getWidth(); i++) {
+			for(int j=0; j<original.getHeight(); j++) {
+
+				red = new Color(original.getRGB(i, j)).getRed();
+				int alpha = new Color(original.getRGB(i, j)).getAlpha();
+				if(red > threshold) {
+					newPixel = 255;
+				}
+				else {
+					newPixel = 0;
+				}
+				newPixel = colorToRGB(alpha, newPixel, newPixel, newPixel);
+				binarized.setRGB(i, j, newPixel); 
+
+			}
+		}
+
+		return binarized;
+
+	}
+
+	private static int colorToRGB(int alpha, int red, int green, int blue) {
+
+		int newPixel = 0;
+		newPixel += alpha;
+		newPixel = newPixel << 8;
+		newPixel += red; newPixel = newPixel << 8;
+		newPixel += green; newPixel = newPixel << 8;
+		newPixel += blue;
+
+		return newPixel;
+
+	}
 }

@@ -24,7 +24,7 @@ import javax.imageio.ImageIO;
  */
 public class CharaterProcessingTest {
 	
-	private static final String BASE_DIR = "/home/francisco/Desenvolvimento_de_software/plataformas/java/workspaces/api/ocr-project/test-resource";
+	private static final String BASE_DIR = "test-resource";
 
 	public static void processImages() throws IOException {
 		CharacterProcessing processing = new CharacterProcessing();
@@ -97,7 +97,7 @@ public class CharaterProcessingTest {
 
 	public static void main(String[] args) {
 		try {	
-			//learm();
+			learm();
 			recogner();
 		} catch (Exception e) {
 			e.printStackTrace();

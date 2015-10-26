@@ -2,7 +2,7 @@
 Implementei e desenvolvi essa aplicação durante meu estudo com processamento de imagens e OCR(Reconhecimento ótico de caracteres).
 Por enquanto são reconhecidas apenas palavras isoladas, ainda não sendo possivel reconhecer espaço e quebras de linha.
 
-Para executar a aplicação e realizar testes de reconhecimento, basta acessar a pasta exemplo e executar o ocr-project.jar, esta compilação ja possui um arquivo serializado com dados de treinamento.
+Para executar a aplicação e realizar testes de reconhecimento, basta acessar o diretorio exemplo e executar o ocr-project.jar, esta compilação ja possui um arquivo serializado com dados de treinamento.
 
 O projeto contem um subdiretorio com a seguintes estrutura:
 * test-resource //Diretorio base de recursos.
@@ -34,4 +34,4 @@ Na caixa de texto logo abaixo da imagem ira aparecer o texto reconhecido e mais 
 ![screenshot](screenshots/7.png)
 
 ## Observações:
-É possivel notar a dificuldade em reconhecimento de determinadas letras, como por exemplo O e 0, L e I entre outras que possui uma proximidade em selelhança, futuramente planejo aplicar algum tipo de classificação para melhorar esses resultados.
+É possivel notar a dificuldade em reconhecimento de determinadas letras, como por exemplo O e 0, L e I entre outras que possui maior semelhança, futuramente planejo aplicar um classificador mais eficiente afim de melhorar os resultados de reconhecimento.

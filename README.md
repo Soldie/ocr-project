@@ -2,11 +2,11 @@
 Implementei e desenvolvi essa aplicação durante meu estudo com processamento de imagens e OCR(Reconhecimento ótico de caracteres).
 Por enquanto são reconhecidas apenas palavras isoladas, ainda não sendo possível reconhecer espaços e quebras de linha.
 
-Para executar a aplicação e realizar testes de reconhecimento, basta acessar o diretório exemplo e executar o ocr-project.jar, esta compilação ja possui um arquivo serializado com dados de treinamento.
+Para executar a aplicação e realizar testes de reconhecimento, basta acessar o diretório exemplo e executar o ocr-project.jar: Esta compilação ja possui um arquivo serializado com dados de treinamento.
 
 O projeto contém um subdiretório com a seguinte estrutura:
 * test-resource //Diretório base de recursos.
-* -> learm //Subdiretório com imagens a serem usadas no treinamento.
+* -> learn //Subdiretório com imagens a serem usadas no treinamento.
 * -> test //Subdiretório com imagens a serem testadas.
 * -> data.ser //Dados de treinamento serializados.
 

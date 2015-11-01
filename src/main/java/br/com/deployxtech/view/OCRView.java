@@ -10,7 +10,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,14 +78,14 @@ public class OCRView extends JDialog {
 		btnSearchImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				FileNameExtensionFilter imageFilter = new FileNameExtensionFilter(
-					    "Image files", ImageIO.getReaderFileSuffixes());
+						"Image files", ImageIO.getReaderFileSuffixes());
 				fc.setFileFilter(imageFilter);
 				fc.setAcceptAllFileFilterUsed(false);
 				int returnVal = fc.showOpenDialog(OCRView.this);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					fileImage = fc.getSelectedFile();
 					lblImage.setIcon(new ImageIcon(fileImage.getAbsolutePath()));
-					
+
 					Pattern pattern = Pattern.compile("(\\()(.*?)(\\))");
 					Matcher matcher = pattern.matcher(fileImage.getName());
 					if (matcher.find()) {
@@ -118,7 +117,7 @@ public class OCRView extends JDialog {
 				}
 			}
 		});
-		
+
 		btnLearm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {

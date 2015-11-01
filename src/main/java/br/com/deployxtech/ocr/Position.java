@@ -10,15 +10,15 @@ import java.io.Serializable;
  *
  */
 public class Position implements Serializable {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private int x;
 	private int y;
-	
+
 	public Position(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -39,7 +39,7 @@ public class Position implements Serializable {
 	public void setY(int y) {
 		this.y = y;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Position) {
@@ -50,18 +50,18 @@ public class Position implements Serializable {
 			return false;
 		}
 	}
-	
+
 	public boolean isSibling(Position position) {
 		return (x+1 == position.x && y+1 == position.y)
-			|| (x+1 == position.x && y == position.y)
-			|| (x+1 == position.x && y-1 == position.y)
-			|| (x == position.x && y+1 == position.y)
-			|| (x == position.x && y-1 == position.y)
-			|| (x-1 == position.x && y+1 == position.y)
-			|| (x-1 == position.x && y == position.y)
-			|| (x-1 == position.x && y-1 == position.y);
+				|| (x+1 == position.x && y == position.y)
+				|| (x+1 == position.x && y-1 == position.y)
+				|| (x == position.x && y+1 == position.y)
+				|| (x == position.x && y-1 == position.y)
+				|| (x-1 == position.x && y+1 == position.y)
+				|| (x-1 == position.x && y == position.y)
+				|| (x-1 == position.x && y-1 == position.y);
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("%s - %s", x, y);

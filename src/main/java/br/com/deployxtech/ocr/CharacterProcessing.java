@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -20,6 +21,9 @@ import javax.imageio.ImageIO;
 public class CharacterProcessing {
 
 	private static BufferedImage original, grayscale, binarized;
+
+	private int averageSpacingWidth;
+	private int averageSpacingHeight;
 
 	public final static int WHITE = Color.WHITE.getRGB(), BLACK = Color.BLACK.getRGB();
 
@@ -55,22 +59,71 @@ public class CharacterProcessing {
 			}
 		}
 
-		CharacterImage previus = null;
+		characters.sort(new Comparator<CharacterImage>() {
+			@Override
+			public int compare(CharacterImage o1, CharacterImage o2) {
+				int order = 0;
+
+				if (o1.getCenterY() >= o2.getInitHeight()+o2.getHeight()) {
+					order = 1;
+				}
+				else if (o1.getCenterY() <= o2.getInitHeight()) {
+					order = -1;
+				}
+				else if (o1.getInitWidth() > o2.getInitWidth()) {
+					order = 1;
+				}
+				else if (o1.getInitWidth() < o2.getInitWidth()) {
+					order = -1;
+				}
+
+				return order;
+			}
+		});
+
 		List<CharacterImage> remove = new ArrayList<CharacterImage>();
 		for (CharacterImage character: characters) {
-			if (previus != null && !remove.contains(previus)) {
-				if (character.isCompl(previus)) {
-					character.add(previus);
-					remove.add(previus);
-				}
-				else if (previus.isCompl(character)) {
-					previus.add(character);
-					remove.add(character);
+			for (CharacterImage characterOther: characters) {
+				if (!character.equals(characterOther) && !remove.contains(characterOther)) {
+					if (character.isCompl(characterOther)) {
+						character.add(characterOther);
+						remove.add(characterOther);
+					}
+					else if (characterOther.isCompl(character)) {
+						characterOther.add(character);
+						remove.add(character);
+					}
+				}	
+			}
+		}
+		characters.removeAll(remove);
+
+		CharacterImage previus = null;
+		int sumSpacesWidth = 0, amountSpacesWidth = 0;
+		int sumSpacesHeight = 0, amountSpacesHeight = 0;
+
+		for (CharacterImage character: characters) {
+			if (previus != null) {
+				int spaceWidh = previus.calculateSpaceWidth(character); 
+				sumSpacesWidth+=spaceWidh;
+				amountSpacesWidth++;
+
+				int spaceHeight = previus.calculateSpaceHeight(character);
+				if (spaceHeight > 0) {
+					sumSpacesHeight+=spaceHeight;
+					amountSpacesHeight++;	
 				}
 			}
 			previus = character;
 		}
-		characters.removeAll(remove);
+		if (sumSpacesWidth > 0 && amountSpacesWidth > 0) {
+			averageSpacingWidth = sumSpacesWidth / amountSpacesWidth;
+			System.out.printf("averageSpacingWidth: %s\n", averageSpacingWidth);
+		}
+		if (sumSpacesHeight > 0 && amountSpacesHeight > 0) {
+			averageSpacingHeight = sumSpacesHeight / amountSpacesHeight;
+		}
+
 		return characters;
 	}
 
@@ -242,6 +295,14 @@ public class CharacterProcessing {
 		newPixel += blue;
 
 		return newPixel;
+	}    
 
+	public boolean isBlankSpace(CharacterImage previus, CharacterImage next) {
+		boolean blankSpace = false;
+		if (previus != null && next != null) {
+			int space = previus.calculateSpaceWidth(next);
+			blankSpace = space > averageSpacingWidth*1.8;
+		}
+		return blankSpace;
 	}
 }

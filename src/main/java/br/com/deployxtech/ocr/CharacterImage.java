@@ -20,12 +20,12 @@ public class CharacterImage implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private List<Position> positions = new ArrayList<Position>();
-	private Position fist;
+	private Position first;
 	private BufferedImage image;
-	private int with, height;
-	private int initWith, initHeight;
+	private int width, height;
+	private int initWidth, initHeight;
 
 	private double proximidade;
 
@@ -40,9 +40,9 @@ public class CharacterImage implements Serializable {
 	}
 
 	public CharacterImage(Position fist) {
-		this.fist = fist;
-		this.initWith = this.fist.getX();
-		this.initHeight = this.fist.getY();
+		this.first = fist;
+		this.initWidth = this.first.getX();
+		this.initHeight = this.first.getY();
 		this.add(fist);
 	}
 
@@ -51,8 +51,8 @@ public class CharacterImage implements Serializable {
 	}
 
 	public void add(Position position) {
-		if (with < position.getX()+1) {
-			with = position.getX()+1;
+		if (width < position.getX()+1) {
+			width = position.getX()+1;
 		}
 		if (height < position.getY()+1) {
 			height = position.getY()+1;
@@ -60,23 +60,23 @@ public class CharacterImage implements Serializable {
 		if (initHeight > position.getY()) {
 			initHeight = position.getY();
 		}
-		if (initWith > position.getX()) {
-			initWith = position.getX();
+		if (initWidth > position.getX()) {
+			initWidth = position.getX();
 		}
 		positions.add(position);
 	}
 
 	public void add(CharacterImage character) {
 		positions.addAll(character.getPositions());
-		if (character.initWith < initWith) {
-			initWith = character.initWith;
-			fist = character.fist;
+		if (character.initWidth < initWidth) {
+			initWidth = character.initWidth;
+			first = character.first;
 		}
 		if (character.initHeight < initHeight) {
 			initHeight = character.initHeight;
 		}
-		if (character.with > with) {
-			with = character.with;
+		if (character.width > width) {
+			width = character.width;
 		}
 		if (character.height > height) {
 			height = character.height;
@@ -88,8 +88,8 @@ public class CharacterImage implements Serializable {
 	}
 
 	public boolean isCompl(CharacterImage character) {
-		return (positions.size()/3.5) > character.positions.size()
-				&& character.initWith >= initWith && character.with <= with;
+		return (positions.size()/2) > character.positions.size()
+				&& character.initWidth >= initWidth && character.width <= width;
 	}
 
 	public boolean isSelf(CharacterImage character) {
@@ -104,10 +104,8 @@ public class CharacterImage implements Serializable {
 	public boolean haveSibling(Position olter) {
 		for (Position position: positions) {
 			if (position.isSibling(olter)) {
-				//System.out.printf("%s = %s\n", position, olter);
 				return true;
 			}
-			//System.out.printf("%s != %s\n", position, olter);
 		}
 		return false;
 	}
@@ -128,30 +126,10 @@ public class CharacterImage implements Serializable {
 		}
 		return positionsScale;
 	}
-	
-	/*public void analisarProximidade(CharacterImage outer) {
-		proximidade = 0;
-		int np = 0;
-		newImage();
-		List<Position> positionsScale = getPositionScale();
-		outer.newImageResize(getWith(), getHeight());
-		List<Position> outerPositions = outer.getPositionScale();
-		for (Position oScale: outerPositions) {
-			if (positionsScale.contains(oScale)) {
-				proximidade++;
-			}
-			else {
-				np++;
-			}
-		}
-
-		proximidade = ((proximidade*2)/(positionsScale.size()+outerPositions.size()))*100;
-		//proximidade = (proximidade/np)*100;
-	}*/
 
 	public void analisarProximidade(CharacterImage outer) {
 		proximidade = 0;
-		newImageResize(outer.getWith(), outer.getHeight());
+		newImageResize(outer.getWidth(), outer.getHeight());
 		List<Position> outerPositions = outer.getPositionScale();
 		List<Position> positionsScale = getPositionScale();
 		int dif = outerPositions.size() - positionsScale.size();		
@@ -161,13 +139,11 @@ public class CharacterImage implements Serializable {
 				proximidade++;
 			}
 			else {
-				//proximidade--;
 				np++;
 			}
 		}
 
 		proximidade = ((proximidade*2)/(positionsScale.size()+outerPositions.size()))*100;
-		//proximidade = (proximidade/np)*100;
 	}
 
 	public BufferedImage newImageScale(int scale) {
@@ -200,9 +176,9 @@ public class CharacterImage implements Serializable {
 	}
 
 	public BufferedImage newImage() {
-		this.image = createImage(with-initWith, height-initHeight);
+		this.image = createImage(width-initWidth, height-initHeight);
 		for (Position position: positions) {
-			image.setRGB(position.getX() - initWith, position.getY() - initHeight, Color.BLACK.getRGB());
+			image.setRGB(position.getX() - initWidth, position.getY() - initHeight, Color.BLACK.getRGB());
 		}
 		return this.image;
 	}
@@ -222,8 +198,8 @@ public class CharacterImage implements Serializable {
 		return positions;
 	}
 
-	public int getWith() {
-		return with-initWith;
+	public int getWidth() {
+		return width-initWidth;
 	}
 
 	public int getHeight() {
@@ -232,5 +208,29 @@ public class CharacterImage implements Serializable {
 
 	public double getProximidade() {
 		return proximidade;
+	}
+
+	public int getInitHeight() {
+		return initHeight;
+	}
+
+	public int getInitWidth() {
+		return initWidth;
+	}
+
+	public int calculateSpaceWidth(CharacterImage characterImage) {
+		return characterImage.getInitWidth()-width;
+	}
+
+	public int calculateSpaceHeight(CharacterImage characterImage) {
+		return characterImage.getInitHeight()-height;
+	}
+
+	public int getCenterY() {
+		return height-(getHeight()/2);
+	}
+
+	public int getCenterX() {
+		return width-(getWidth()/2);
 	}
 }

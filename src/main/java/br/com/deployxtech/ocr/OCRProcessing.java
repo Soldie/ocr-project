@@ -12,12 +12,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  * @author francisco
@@ -26,9 +23,9 @@ import javax.swing.JTextField;
 public class OCRProcessing {
 
 	private static final String BASE_DIR = "test-resource";
-	
+
 	private JTextArea txtConsole;
-	
+
 	public OCRProcessing() {}
 	public OCRProcessing(JTextArea txtConsole) {
 		this.txtConsole = txtConsole;
@@ -55,6 +52,7 @@ public class OCRProcessing {
 		List<CharacterImage> characters = processing.discover(image);
 		StringBuilder txt = new StringBuilder();
 
+		CharacterImage previus = null;
 		for (CharacterImage character: characters) {
 			//ImageIO.write(character.newImage(), "png", new File(BASE_DIR+"/result-processing/"+new Date().getTime()+".png"));
 			character.newImage();
@@ -65,8 +63,14 @@ public class OCRProcessing {
 					prox = charLearn;
 				}
 			}
+
+			if (processing.isBlankSpace(previus, character)) {
+				txt.append(" ");
+			}
+
 			txt.append(prox.getCharacter());
 			print(String.format("Char: %s, Prox: %s\n", prox.getCharacter(), prox.getProximidade()));
+			previus = character;
 		}
 
 		print(String.format("O resultado é: %s\n", txt.toString()));
@@ -76,11 +80,11 @@ public class OCRProcessing {
 
 	private void save(List<CharacterImage> characters) throws IOException, ClassNotFoundException {
 		File fileData = new File(BASE_DIR+"/data.ser");
-		
+
 		if (!fileData.getParentFile().exists()) {
 			fileData.getParentFile().mkdirs();
 		}
-		
+
 		List<CharacterImage> charactersLearn = loadData();
 		charactersLearn.addAll(characters);
 		FileOutputStream fos = new FileOutputStream(fileData);
@@ -103,10 +107,10 @@ public class OCRProcessing {
 		else {
 			charactersLearn = new ArrayList<CharacterImage>();
 		}
-		
+
 		return charactersLearn;
 	}
-	
+
 	private void print(String text) {
 		if (txtConsole == null) {
 			System.out.print(text);

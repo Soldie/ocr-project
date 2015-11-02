@@ -59,28 +59,6 @@ public class CharacterProcessing {
 			}
 		}
 
-		/*characters.sort(new Comparator<CharacterImage>() {
-			@Override
-			public int compare(CharacterImage o1, CharacterImage o2) {
-				int order = 0;
-
-				if (o1.getCenterY() >= o2.getInitHeight()+o2.getHeight()) {
-					order = 1;
-				}
-				else if (o1.getCenterY() <= o2.getInitHeight()) {
-					order = -1;
-				}
-				else if (o1.getInitWidth() > o2.getInitWidth()) {
-					order = 1;
-				}
-				else if (o1.getInitWidth() < o2.getInitWidth()) {
-					order = -1;
-				}
-
-				return order;
-			}
-		});*/
-
 		List<CharacterImage> remove = new ArrayList<CharacterImage>();
 		for (CharacterImage character: characters) {
 			for (CharacterImage characterOther: characters) {
@@ -302,7 +280,6 @@ public class CharacterProcessing {
 		if (previus != null && next != null) {
 			double space = previus.calculateSpaceWidth(next);
 			blankSpace = space > averageSpacingWidth*1.8;
-			System.out.printf("space: %s, averageSpacingWidth: %s = %s", space, averageSpacingWidth, averageSpacingWidth*1.8);
 		}
 		return blankSpace;
 	}

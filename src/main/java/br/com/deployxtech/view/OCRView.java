@@ -12,10 +12,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -72,11 +69,11 @@ public class OCRView extends JDialog {
 
 	private void init() {
 		GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
-	    Font[] fonts = e.getAllFonts();
-	    for (Font font: fonts) {
-	    	cmbFonts.addItem(font.getFontName());
-	    }
-		
+		Font[] fonts = e.getAllFonts();
+		for (Font font: fonts) {
+			cmbFonts.addItem(font.getFontName());
+		}
+
 		setLayout(new BorderLayout(10,10));
 		pnlControl.add(btnSearchImage);
 		pnlControl.add(btnTest);
@@ -164,18 +161,18 @@ public class OCRView extends JDialog {
 				}
 			}
 		});
-		
+
 		cmbFonts.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String text = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ .,!?-_ 0123456789";	
 				Font font = fonts[cmbFonts.getSelectedIndex()];
 				font = new Font(font.getFontName(), Font.PLAIN, 40);
-				
+
 				Rectangle2D rectagleText = font.getStringBounds(text, new FontRenderContext(new AffineTransform(), true, true));
-				
+
 				int width = new Double(rectagleText.getWidth()).intValue()+20, height = new Double(rectagleText.getHeight()).intValue()+15;
-				
+
 
 				BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 

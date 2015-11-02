@@ -67,7 +67,6 @@ public class OCRProcessing {
 			if (processing.isBlankSpace(previus, character)) {
 				txt.append(" ");
 			}
-			System.out.printf(" == %s\n", prox.getCharacter());
 
 			txt.append(prox.getCharacter());
 			print(String.format("Char: %s, Prox: %s\n", prox.getCharacter(), prox.getProximidade()));

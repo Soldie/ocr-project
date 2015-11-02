@@ -145,6 +145,31 @@ public class CharacterImage implements Serializable {
 
 		proximidade = ((proximidade*2)/(positionsScale.size()+outerPositions.size()))*100;
 	}
+	
+	public void analisarProximidade2(CharacterImage outer) {
+		proximidade = 0;
+		newImageResize(outer.getWidth(), outer.getHeight());
+		List<Position> outerPositions = outer.getPositionScale();
+		List<Position> positionsScale = getPositionScale();
+		for (Position pScale: positionsScale) {
+			if (outerPositions.contains(pScale)) {
+				proximidade++;
+			}
+			else {
+				proximidade--;
+			}
+		}
+		for (Position pScale: outerPositions) {
+			if (positionsScale.contains(pScale)) {
+				proximidade++;
+			}
+			else {
+				proximidade--;
+			}
+		}
+
+		proximidade = ((proximidade)/(positionsScale.size()+outerPositions.size()))*100;
+	}
 
 	public BufferedImage newImageScale(int scale) {
 
@@ -183,12 +208,12 @@ public class CharacterImage implements Serializable {
 		return this.image;
 	}
 
-	private BufferedImage createImage(int with, int height) {
-		BufferedImage newImage = new BufferedImage(with, height, BufferedImage.TYPE_INT_RGB);
+	private BufferedImage createImage(int width, int height) {
+		BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		Graphics2D g2d = (Graphics2D) newImage.getGraphics();
 		g2d.setColor(Color.white);
-		g2d.fillRect(0, 0, with, height);
+		g2d.fillRect(0, 0, width, height);
 		g2d.dispose();
 
 		return newImage;
@@ -218,11 +243,11 @@ public class CharacterImage implements Serializable {
 		return initWidth;
 	}
 
-	public int calculateSpaceWidth(CharacterImage characterImage) {
+	public double calculateSpaceWidth(CharacterImage characterImage) {
 		return characterImage.getInitWidth()-width;
 	}
 
-	public int calculateSpaceHeight(CharacterImage characterImage) {
+	public double calculateSpaceHeight(CharacterImage characterImage) {
 		return characterImage.getInitHeight()-height;
 	}
 

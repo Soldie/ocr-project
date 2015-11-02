@@ -22,8 +22,8 @@ public class CharacterProcessing {
 
 	private static BufferedImage original, grayscale, binarized;
 
-	private int averageSpacingWidth;
-	private int averageSpacingHeight;
+	private double averageSpacingWidth;
+	private double averageSpacingHeight;
 
 	public final static int WHITE = Color.WHITE.getRGB(), BLACK = Color.BLACK.getRGB();
 
@@ -59,7 +59,7 @@ public class CharacterProcessing {
 			}
 		}
 
-		characters.sort(new Comparator<CharacterImage>() {
+		/*characters.sort(new Comparator<CharacterImage>() {
 			@Override
 			public int compare(CharacterImage o1, CharacterImage o2) {
 				int order = 0;
@@ -79,7 +79,7 @@ public class CharacterProcessing {
 
 				return order;
 			}
-		});
+		});*/
 
 		List<CharacterImage> remove = new ArrayList<CharacterImage>();
 		for (CharacterImage character: characters) {
@@ -99,16 +99,16 @@ public class CharacterProcessing {
 		characters.removeAll(remove);
 
 		CharacterImage previus = null;
-		int sumSpacesWidth = 0, amountSpacesWidth = 0;
-		int sumSpacesHeight = 0, amountSpacesHeight = 0;
+		double sumSpacesWidth = 0, amountSpacesWidth = 0;
+		double sumSpacesHeight = 0, amountSpacesHeight = 0;
 
 		for (CharacterImage character: characters) {
 			if (previus != null) {
-				int spaceWidh = previus.calculateSpaceWidth(character); 
+				double spaceWidh = previus.calculateSpaceWidth(character); 
 				sumSpacesWidth+=spaceWidh;
 				amountSpacesWidth++;
 
-				int spaceHeight = previus.calculateSpaceHeight(character);
+				double spaceHeight = previus.calculateSpaceHeight(character);
 				if (spaceHeight > 0) {
 					sumSpacesHeight+=spaceHeight;
 					amountSpacesHeight++;	
@@ -300,8 +300,9 @@ public class CharacterProcessing {
 	public boolean isBlankSpace(CharacterImage previus, CharacterImage next) {
 		boolean blankSpace = false;
 		if (previus != null && next != null) {
-			int space = previus.calculateSpaceWidth(next);
+			double space = previus.calculateSpaceWidth(next);
 			blankSpace = space > averageSpacingWidth*1.8;
+			System.out.printf("space: %s, averageSpacingWidth: %s = %s", space, averageSpacingWidth, averageSpacingWidth*1.8);
 		}
 		return blankSpace;
 	}

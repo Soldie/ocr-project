@@ -6,9 +6,19 @@ package br.com.deployxtech.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +27,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -40,6 +51,7 @@ public class OCRView extends JDialog {
 	private JPanel pnlControl = new JPanel();
 
 	private JLabel lblImage = new JLabel();
+	private JComboBox<String> cmbFonts = new JComboBox<>();
 	private JButton btnSearchImage = new JButton("Selecionar...");
 	private JPanel pnlImage = new JPanel();
 	private JTextField txtResult = new JTextField();
@@ -50,7 +62,7 @@ public class OCRView extends JDialog {
 
 	private OCRProcessing processing = new OCRProcessing(txtConsole);
 
-	private File fileImage;
+	private BufferedImage image;
 
 	public OCRView() {
 		setTitle("OCR-Project(Reconhecimento ótico de caracteres)");
@@ -59,10 +71,18 @@ public class OCRView extends JDialog {
 	}
 
 	private void init() {
+		GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	    Font[] fonts = e.getAllFonts();
+	    for (Font font: fonts) {
+	    	cmbFonts.addItem(font.getFontName());
+	    }
+		
 		setLayout(new BorderLayout(10,10));
 		pnlControl.add(btnSearchImage);
 		pnlControl.add(btnTest);
 		pnlControl.add(btnLearm);
+		pnlControl.add(cmbFonts);
+		pnlControl.setPreferredSize(new Dimension(800, 60));
 		getContentPane().add(pnlControl, BorderLayout.NORTH);
 		pnlProcessing.setLayout(new GridLayout(2, 1));
 		JScrollPane imageScroll = new JScrollPane(lblImage);
@@ -77,24 +97,30 @@ public class OCRView extends JDialog {
 
 		btnSearchImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileNameExtensionFilter imageFilter = new FileNameExtensionFilter(
-						"Image files", ImageIO.getReaderFileSuffixes());
-				fc.setFileFilter(imageFilter);
-				fc.setAcceptAllFileFilterUsed(false);
-				int returnVal = fc.showOpenDialog(OCRView.this);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					fileImage = fc.getSelectedFile();
-					lblImage.setIcon(new ImageIcon(fileImage.getAbsolutePath()));
+				try {
+					FileNameExtensionFilter imageFilter = new FileNameExtensionFilter(
+							"Image files", ImageIO.getReaderFileSuffixes());
+					fc.setFileFilter(imageFilter);
+					fc.setAcceptAllFileFilterUsed(false);
+					int returnVal = fc.showOpenDialog(OCRView.this);
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						File fileImage = fc.getSelectedFile();
+						image = ImageIO.read(fileImage);
+						lblImage.setIcon(new ImageIcon(image));
 
-					Pattern pattern = Pattern.compile("(\\()(.*?)(\\))");
-					Matcher matcher = pattern.matcher(fileImage.getName());
-					if (matcher.find()) {
-						String letras = matcher.group(2);
-						txtResult.setText(letras);
+						Pattern pattern = Pattern.compile("(\\()(.*?)(\\))");
+						Matcher matcher = pattern.matcher(fileImage.getName());
+						if (matcher.find()) {
+							String letras = matcher.group(2);
+							txtResult.setText(letras);
+						}
+						else {
+							txtResult.setText("");
+						}
 					}
-					else {
-						txtResult.setText("");
-					}
+				}
+				catch (Exception ex) {
+					ex.printStackTrace();
 				}
 			}
 		});
@@ -102,14 +128,14 @@ public class OCRView extends JDialog {
 		btnTest.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					if (fileImage == null) {
+					if (image == null) {
 						JOptionPane.showMessageDialog(OCRView.this, "É preciso selecionar uma imagem.");
 					}
 					else if (!txtResult.getText().equals("")) {
 						JOptionPane.showMessageDialog(OCRView.this, "É preciso apagar a caixa de texto para realizar o teste.");
 					}
 					else {
-						String result = processing.recogner(ImageIO.read(fileImage));
+						String result = processing.recogner(image);
 						txtResult.setText(result);
 					}
 				} catch (Exception e) {
@@ -121,14 +147,14 @@ public class OCRView extends JDialog {
 		btnLearm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					if (fileImage == null) {
+					if (image == null) {
 						JOptionPane.showMessageDialog(OCRView.this, "É preciso selecionar uma imagem.");
 					}
 					else if (txtResult.getText().equals("")) {
 						JOptionPane.showMessageDialog(OCRView.this, "É preciso escrever as letras exatamente como esta na imagem.");
 					}
 					else {
-						processing.learm(txtResult.getText(), ImageIO.read(fileImage));
+						processing.learm(txtResult.getText(), image);
 						txtResult.setText("");
 						lblImage.setIcon(null);
 						JOptionPane.showMessageDialog(OCRView.this, "Letras aprendidas...");
@@ -138,6 +164,34 @@ public class OCRView extends JDialog {
 				}
 			}
 		});
+		
+		cmbFonts.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String text = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ .,!?-_ 0123456789";	
+				Font font = fonts[cmbFonts.getSelectedIndex()];
+				font = new Font(font.getFontName(), Font.PLAIN, 40);
+				
+				Rectangle2D rectagleText = font.getStringBounds(text, new FontRenderContext(new AffineTransform(), true, true));
+				
+				int width = new Double(rectagleText.getWidth()).intValue()+20, height = new Double(rectagleText.getHeight()).intValue()+15;
+				
+
+				BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+				Graphics2D g2d = (Graphics2D) newImage.getGraphics();
+				g2d.setColor(Color.white);
+				g2d.fillRect(0, 0, width, height);
+				g2d.setColor(Color.black);
+				g2d.setFont(font);
+				g2d.drawString(text, 10, height-15);
+				g2d.dispose();
+
+				lblImage.setIcon(new ImageIcon(newImage));
+				txtResult.setText(text.replace(" ", ""));
+				image = newImage;
+			}
+		});;
 	}
 
 	/**

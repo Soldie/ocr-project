@@ -132,14 +132,9 @@ public class CharacterImage implements Serializable {
 		newImageResize(outer.getWidth(), outer.getHeight());
 		List<Position> outerPositions = outer.getPositionScale();
 		List<Position> positionsScale = getPositionScale();
-		int dif = outerPositions.size() - positionsScale.size();		
-		int np = 0;
 		for (Position pScale: positionsScale) {
 			if (outerPositions.contains(pScale)) {
 				proximidade++;
-			}
-			else {
-				np++;
 			}
 		}
 

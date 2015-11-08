@@ -25,11 +25,11 @@ public class OCRProcessing {
 	private static final String BASE_DIR = "test-resource";
 
 	private JTextArea txtConsole;
-	private List<CharacterImage> charactersLearn;
+	private Classification chassification;
 
 	public OCRProcessing() {
 		try {
-			loadData();
+			this.chassification = new PixelsPositionsClassification(loadData());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -60,29 +60,18 @@ public class OCRProcessing {
 		CharacterImage previus = null;
 		for (CharacterImage character: characters) {
 			//ImageIO.write(character.newImage(), "png", new File(BASE_DIR+"/result-processing/"+new Date().getTime()+".png"));
-			character.newImage();
-			CharacterImage prox = null;
-			for (CharacterImage charLearn: charactersLearn) {
-				charLearn.analisarProximidade2(character);
-				if (prox == null || (prox.getProximidade() < charLearn.getProximidade())) {
-					prox = charLearn;
-				}
-				
-				/*if (prox.getProximidade() > 90d) {
-					break;
-				}*/
-			}
+			CharacterImage candidate = chassification.analyze(character);
 
 			if (processing.isBlankSpace(previus, character)) {
 				txt.append(" ");
 			}
 
-			txt.append(prox.getCharacter());
-			//print(String.format("Char: %s, Prox: %s\n", prox.getCharacter(), prox.getProximidade()));
+			txt.append(candidate.getCharacter());
+			print(String.format("Char: %s, Prox: %s\n", candidate.getCharacter(), candidate.getProximidade()));
 			previus = character;
 		}
 
-		//print(String.format("O resultado é: %s\n", txt.toString()));
+		print(String.format("O resultado é: %s\n", txt.toString()));
 
 		return txt.toString();
 	}
@@ -94,35 +83,39 @@ public class OCRProcessing {
 			fileData.getParentFile().mkdirs();
 		}
 
-		charactersLearn.addAll(characters);
+		chassification.getCharacters().addAll(characters);
 		FileOutputStream fos = new FileOutputStream(fileData);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(charactersLearn);
+		oos.writeObject(chassification.getCharacters());
 		oos.close();
 		fos.close();
 	}
 
-	private void loadData() throws FileNotFoundException, IOException, ClassNotFoundException {
+	private List<CharacterImage> loadData() throws FileNotFoundException, IOException, ClassNotFoundException {
 		File fileData = new File(BASE_DIR+"/data.ser");
+
+		List<CharacterImage> characters = null;
 
 		if (fileData.exists()) {
 			FileInputStream fis = new FileInputStream(fileData);
 			ObjectInputStream ois = new ObjectInputStream(fis);
-			charactersLearn = (List<CharacterImage>) ois.readObject();
+			characters = (List<CharacterImage>) ois.readObject();
 			fis.close();
 			ois.close();
 		}
 		else {
-			charactersLearn = new ArrayList<CharacterImage>();
+			characters = new ArrayList<CharacterImage>();
 		}
+
+		return characters;
 	}
 
 	private void print(String text) {
-		/*if (txtConsole == null) {
-			System.out.print(text);
+		if (txtConsole == null) {
+			//System.out.print(text);
 		}
 		else {
 			txtConsole.append(text);
-		}*/
+		}
 	}
 }

@@ -96,7 +96,7 @@ public class CharacterProcessing {
 		}
 		if (sumSpacesWidth > 0 && amountSpacesWidth > 0) {
 			averageSpacingWidth = sumSpacesWidth / amountSpacesWidth;
-			System.out.printf("averageSpacingWidth: %s\n", averageSpacingWidth);
+			//System.out.printf("averageSpacingWidth: %s\n", averageSpacingWidth);
 		}
 		if (sumSpacesHeight > 0 && amountSpacesHeight > 0) {
 			averageSpacingHeight = sumSpacesHeight / amountSpacesHeight;
@@ -238,7 +238,7 @@ public class CharacterProcessing {
 
 		int threshold = otsuTreshold(original);
 
-		System.out.printf("threshold: %s\n", threshold);
+		//System.out.printf("threshold: %s\n", threshold);
 
 		BufferedImage binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
 

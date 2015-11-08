@@ -25,9 +25,17 @@ public class OCRProcessing {
 	private static final String BASE_DIR = "test-resource";
 
 	private JTextArea txtConsole;
+	private List<CharacterImage> charactersLearn;
 
-	public OCRProcessing() {}
+	public OCRProcessing() {
+		try {
+			loadData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	public OCRProcessing(JTextArea txtConsole) {
+		this();
 		this.txtConsole = txtConsole;
 	}
 
@@ -45,9 +53,6 @@ public class OCRProcessing {
 	}
 
 	public String recogner(BufferedImage image) throws FileNotFoundException, ClassNotFoundException, IOException {
-
-		List<CharacterImage> charactersLearn = loadData();
-
 		CharacterProcessing processing = new CharacterProcessing();
 		List<CharacterImage> characters = processing.discover(image);
 		StringBuilder txt = new StringBuilder();
@@ -62,6 +67,10 @@ public class OCRProcessing {
 				if (prox == null || (prox.getProximidade() < charLearn.getProximidade())) {
 					prox = charLearn;
 				}
+				
+				/*if (prox.getProximidade() > 90d) {
+					break;
+				}*/
 			}
 
 			if (processing.isBlankSpace(previus, character)) {
@@ -69,11 +78,11 @@ public class OCRProcessing {
 			}
 
 			txt.append(prox.getCharacter());
-			print(String.format("Char: %s, Prox: %s\n", prox.getCharacter(), prox.getProximidade()));
+			//print(String.format("Char: %s, Prox: %s\n", prox.getCharacter(), prox.getProximidade()));
 			previus = character;
 		}
 
-		print(String.format("O resultado é: %s\n", txt.toString()));
+		//print(String.format("O resultado é: %s\n", txt.toString()));
 
 		return txt.toString();
 	}
@@ -85,7 +94,6 @@ public class OCRProcessing {
 			fileData.getParentFile().mkdirs();
 		}
 
-		List<CharacterImage> charactersLearn = loadData();
 		charactersLearn.addAll(characters);
 		FileOutputStream fos = new FileOutputStream(fileData);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -94,9 +102,9 @@ public class OCRProcessing {
 		fos.close();
 	}
 
-	private List<CharacterImage> loadData() throws FileNotFoundException, IOException, ClassNotFoundException {
+	private void loadData() throws FileNotFoundException, IOException, ClassNotFoundException {
 		File fileData = new File(BASE_DIR+"/data.ser");
-		List<CharacterImage> charactersLearn = null;
+
 		if (fileData.exists()) {
 			FileInputStream fis = new FileInputStream(fileData);
 			ObjectInputStream ois = new ObjectInputStream(fis);
@@ -107,16 +115,14 @@ public class OCRProcessing {
 		else {
 			charactersLearn = new ArrayList<CharacterImage>();
 		}
-
-		return charactersLearn;
 	}
 
 	private void print(String text) {
-		if (txtConsole == null) {
+		/*if (txtConsole == null) {
 			System.out.print(text);
 		}
 		else {
 			txtConsole.append(text);
-		}
+		}*/
 	}
 }

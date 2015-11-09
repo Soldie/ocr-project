@@ -90,8 +90,12 @@ public class CharacterImage implements Serializable {
 	}
 
 	public boolean isCompl(CharacterImage character) {
+		int space1 = initHeight - character.height;
+		int space2 = character.initHeight - height;
 		return (positions.size()/2) > character.positions.size()
-				&& character.initWidth >= initWidth && character.width <= width;
+				&& character.initWidth >= initWidth && character.width <= width
+				&& ((space1 >= 0 && space1 < getHeight()/2)
+				|| (space2 >= 0 && space2 < getHeight()/2));
 	}
 
 	public boolean isSelf(CharacterImage character) {

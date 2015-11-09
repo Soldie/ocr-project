@@ -59,7 +59,7 @@ public class CharacterProcessing {
 			}
 		}
 		
-		/*List<Integer> heightLines = new ArrayList<>();
+		List<Integer> heightLines = new ArrayList<>();
 		boolean init = false;
 		for (int y = 0; y < image.getHeight(); y++) {
 			boolean isLine = true;
@@ -93,7 +93,7 @@ public class CharacterProcessing {
 		last.setLineBreak(false);
 		characters = charactersByLine;
 
-		List<CharacterImage> remove = new ArrayList<CharacterImage>();
+		/*List<CharacterImage> remove = new ArrayList<CharacterImage>();
 		for (CharacterImage character: characters) {
 			topHeightLine = null;
 			for (Integer heightLine: heightLines) {

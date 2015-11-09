@@ -11,9 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JTextArea;
 
 /**
@@ -59,7 +62,7 @@ public class OCRProcessing {
 
 		CharacterImage previus = null;
 		for (CharacterImage character: characters) {
-			//ImageIO.write(character.newImage(), "png", new File(BASE_DIR+"/result-processing/"+new Date().getTime()+".png"));
+			//ImageIO.write(character.newImage(), "png", new File(BASE_DIR+"/result-processing/"+Instant.now().toEpochMilli()+".png"));
 			CharacterImage candidate = chassification.analyze(character);
 
 			if (processing.isBlankSpace(previus, character)) {
@@ -67,6 +70,11 @@ public class OCRProcessing {
 			}
 
 			txt.append(candidate.getCharacter());
+			
+			if (character.isLineBreak()) {
+				txt.append("\n");
+			}
+			
 			print(String.format("Char: %s, Prox: %s\n", candidate.getCharacter(), candidate.getProximidade()));
 			previus = character;
 		}

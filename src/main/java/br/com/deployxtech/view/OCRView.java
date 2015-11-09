@@ -51,7 +51,7 @@ public class OCRView extends JDialog {
 	private JComboBox<String> cmbFonts = new JComboBox<>();
 	private JButton btnSearchImage = new JButton("Selecionar...");
 	private JPanel pnlImage = new JPanel();
-	private JTextField txtResult = new JTextField();
+	private JTextArea txtResult = new JTextArea();
 	private JTextArea txtConsole = new JTextArea();
 	private JPanel pnlProcessing = new JPanel(new BorderLayout(10,10));
 

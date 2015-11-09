@@ -28,16 +28,16 @@ public class PixelsPositionsClassification implements Classification {
 				bestCandidate = charAnalyze;
 			}
 			
-			if (bestCandidate.getProximidade() > averageProximity) {
+			/*if (bestCandidate.getProximidade() > averageProximity) {
 				break;
-			}
+			}*/
 		}
 		
 		averageProximity = (averageProximity+bestCandidate.getProximidade())/2;
 		
-		if (this.characters.remove(bestCandidate)) {
+		/*if (this.characters.remove(bestCandidate)) {
 			this.characters.add(0,bestCandidate);
-		}
+		}*/
 
 		return bestCandidate;
 	}

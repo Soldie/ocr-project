@@ -58,20 +58,63 @@ public class CharacterProcessing {
 				}
 			}
 		}
+		
+		List<Integer> heightLines = new ArrayList<>();
+		boolean init = false;
+		for (int y = 0; y < image.getHeight(); y++) {
+			boolean isLine = true;
+			for (int x = 0; x < image.getWidth(); x++) {
+				if (WHITE != image.getRGB(x, y)) {
+					init = true;
+					isLine = false;
+					break;
+				}
+			}
+			if (init && isLine) {
+				init = false;
+				heightLines.add(y);
+			}
+		}
+		
+		List<CharacterImage> charactersByLine = new ArrayList<>();
+		CharacterImage last = null;
+		Integer topHeightLine = null;
+		for (Integer heightLine: heightLines) {
+			for (CharacterImage character: characters) {
+				if (character.getInitHeight()+character.getHeight() <= heightLine
+						&& (topHeightLine == null || character.getInitHeight() > topHeightLine)) {
+					charactersByLine.add(character);
+					last = character;
+				}
+			}
+			last.setLineBreak(true);
+			topHeightLine = heightLine;
+		}
+		last.setLineBreak(false);
+		characters = charactersByLine;
 
 		List<CharacterImage> remove = new ArrayList<CharacterImage>();
 		for (CharacterImage character: characters) {
-			for (CharacterImage characterOther: characters) {
-				if (!character.equals(characterOther) && !remove.contains(characterOther)) {
-					if (character.isCompl(characterOther)) {
-						character.add(characterOther);
-						remove.add(characterOther);
+			topHeightLine = null;
+			for (Integer heightLine: heightLines) {
+				if (character.getInitHeight()+character.getHeight() <= heightLine) {
+					for (CharacterImage characterOther: characters) {
+						if (!character.equals(characterOther) && !remove.contains(characterOther)
+								&& characterOther.getInitHeight()+characterOther.getHeight() <= heightLine
+								&& (topHeightLine == null || characterOther.getInitHeight() > topHeightLine)) {
+							if (character.isCompl(characterOther)) {
+								character.add(characterOther);
+								remove.add(characterOther);
+							}
+							else if (characterOther.isCompl(character)) {
+								characterOther.add(character);
+								remove.add(character);
+							}
+						}	
 					}
-					else if (characterOther.isCompl(character)) {
-						characterOther.add(character);
-						remove.add(character);
-					}
-				}	
+					break;
+				}
+				topHeightLine = heightLine;
 			}
 		}
 		characters.removeAll(remove);
@@ -82,9 +125,11 @@ public class CharacterProcessing {
 
 		for (CharacterImage character: characters) {
 			if (previus != null) {
-				double spaceWidh = previus.calculateSpaceWidth(character); 
-				sumSpacesWidth+=spaceWidh;
-				amountSpacesWidth++;
+				double spaceWidh = previus.calculateSpaceWidth(character);
+				if (spaceWidh > 0) {
+					sumSpacesWidth+=spaceWidh;
+					amountSpacesWidth++;
+				}
 
 				double spaceHeight = previus.calculateSpaceHeight(character);
 				if (spaceHeight > 0) {
@@ -273,7 +318,7 @@ public class CharacterProcessing {
 		newPixel += blue;
 
 		return newPixel;
-	}    
+	}
 
 	public boolean isBlankSpace(CharacterImage previus, CharacterImage next) {
 		boolean blankSpace = false;

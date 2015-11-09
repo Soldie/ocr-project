@@ -30,6 +30,8 @@ public class CharacterImage implements Serializable {
 	private double proximidade;
 
 	private char character;
+	
+	private boolean isLineBreak;
 
 	public char getCharacter() {
 		return character;
@@ -252,5 +254,13 @@ public class CharacterImage implements Serializable {
 
 	public int getCenterX() {
 		return width-(getWidth()/2);
+	}
+
+	public boolean isLineBreak() {
+		return isLineBreak;
+	}
+
+	public void setLineBreak(boolean isLineBreak) {
+		this.isLineBreak = isLineBreak;
 	}
 }

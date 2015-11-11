@@ -145,6 +145,8 @@ public class CharacterImage implements Serializable {
 		}
 
 		proximidade = ((proximidade*2)/(positionsScale.size()+outerPositions.size()))*100;
+		
+		image = null;
 	}
 	
 	public void analisarProximidade2(CharacterImage outer) {

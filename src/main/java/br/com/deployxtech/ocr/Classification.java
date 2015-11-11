@@ -6,7 +6,7 @@ package br.com.deployxtech.ocr;
 import java.util.List;
 
 /**
- * @author francisco
+ * @author Francisco Silva
  *
  */
 public interface Classification {

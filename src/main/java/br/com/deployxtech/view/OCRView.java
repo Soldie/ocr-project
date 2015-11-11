@@ -32,17 +32,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import br.com.deployxtech.ocr.OCRProcessing;
 
 /**
- * @author francisco
+ * @author Francisco Silva
  *
  */
 public class OCRView extends JDialog {
 
+	private static final long serialVersionUID = 1L;
+	
 	private JButton btnTest = new JButton("Testar");
 	private JButton btnLearm = new JButton("Treinar");
 	private JPanel pnlControl = new JPanel();

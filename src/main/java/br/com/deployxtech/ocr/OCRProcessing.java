@@ -17,7 +17,7 @@ import java.util.List;
 import javax.swing.JTextArea;
 
 /**
- * @author francisco
+ * @author Francisco Silva
  *
  */
 public class OCRProcessing {
@@ -67,11 +67,11 @@ public class OCRProcessing {
 			}
 
 			txt.append(candidate.getCharacter());
-			
+
 			if (character.isLineBreak()) {
 				txt.append("\n");
 			}
-			
+
 			print(String.format("Char: %s, Prox: %s\n", candidate.getCharacter(), candidate.getProximidade()));
 			previus = character;
 		}

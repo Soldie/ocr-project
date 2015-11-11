@@ -9,18 +9,17 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
 /**
- * @author francisco
+ * @author Francisco Silva
  *
  */
 public class CharacterProcessing {
 
-	private static BufferedImage original, grayscale, binarized;
+	private static BufferedImage grayscale, binarized;
 
 	private double averageSpacingWidth;
 	private double averageSpacingHeight;
@@ -29,7 +28,6 @@ public class CharacterProcessing {
 
 	public List<CharacterImage> discover(BufferedImage image) throws IOException {
 		image = processing(image);
-		//image = processing2(image);
 
 		List<CharacterImage> characters = new ArrayList<CharacterImage>();
 		for (int x = 0; x < image.getWidth(); x++) {
@@ -58,7 +56,7 @@ public class CharacterProcessing {
 				}
 			}
 		}
-		
+
 		List<Integer> heightLines = new ArrayList<>();
 		boolean init = false;
 		for (int y = 0; y < image.getHeight(); y++) {
@@ -75,7 +73,7 @@ public class CharacterProcessing {
 				heightLines.add(y);
 			}
 		}
-		
+
 		List<CharacterImage> charactersByLine = new ArrayList<>();
 		CharacterImage last = null;
 		Integer topHeightLine = null;
@@ -93,45 +91,20 @@ public class CharacterProcessing {
 		last.setLineBreak(false);
 		characters = charactersByLine;
 
-		/*List<CharacterImage> remove = new ArrayList<CharacterImage>();
-		for (CharacterImage character: characters) {
-			topHeightLine = null;
-			for (Integer heightLine: heightLines) {
-				if (character.getInitHeight()+character.getHeight() <= heightLine) {
-					for (CharacterImage characterOther: characters) {
-						if (!character.equals(characterOther) && !remove.contains(characterOther)
-								&& characterOther.getInitHeight()+characterOther.getHeight() <= heightLine
-								&& (topHeightLine == null || characterOther.getInitHeight() > topHeightLine)) {
-							if (character.isCompl(characterOther)) {
-								character.add(characterOther);
-								remove.add(characterOther);
-							}
-							else if (characterOther.isCompl(character)) {
-								characterOther.add(character);
-								remove.add(character);
-							}
-						}	
-					}
-					break;
-				}
-				topHeightLine = heightLine;
-			}
-		}*/
-
 		List<CharacterImage> remove = new ArrayList<CharacterImage>();
 		for (CharacterImage character: characters) {
-					for (CharacterImage characterOther: characters) {
-						if (!character.equals(characterOther) && !remove.contains(characterOther)) {
-							if (character.isCompl(characterOther)) {
-								character.add(characterOther);
-								remove.add(characterOther);
-							}
-							else if (characterOther.isCompl(character)) {
-								characterOther.add(character);
-								remove.add(character);
-							}
-						}	
+			for (CharacterImage characterOther: characters) {
+				if (!character.equals(characterOther) && !remove.contains(characterOther)) {
+					if (character.isCompl(characterOther)) {
+						character.add(characterOther);
+						remove.add(characterOther);
 					}
+					else if (characterOther.isCompl(character)) {
+						characterOther.add(character);
+						remove.add(character);
+					}
+				}	
+			}
 		}
 		characters.removeAll(remove);
 
@@ -157,7 +130,6 @@ public class CharacterProcessing {
 		}
 		if (sumSpacesWidth > 0 && amountSpacesWidth > 0) {
 			averageSpacingWidth = sumSpacesWidth / amountSpacesWidth;
-			//System.out.printf("averageSpacingWidth: %s\n", averageSpacingWidth);
 		}
 		if (sumSpacesHeight > 0 && amountSpacesHeight > 0) {
 			averageSpacingHeight = sumSpacesHeight / amountSpacesHeight;
@@ -194,8 +166,6 @@ public class CharacterProcessing {
 		BufferedImage output = new BufferedImage(image.getWidth(),  
 				image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);  
 
-		// Percorre a imagem definindo na saída o pixel como branco se o valor  
-		// na entrada for menor que o threshold, ou como preto se for maior.  
 		for (int y = 0; y < image.getHeight(); y++)  
 			for (int x = 0; x < image.getWidth(); x++) {  
 				Color pixel = new Color(image.getRGB(x, y));  
@@ -211,7 +181,6 @@ public class CharacterProcessing {
 	}
 
 	public static int[] imageHistogram(BufferedImage input) {
-
 		int[] histogram = new int[256];
 
 		for(int i=0; i<histogram.length; i++) histogram[i] = 0;
@@ -224,11 +193,9 @@ public class CharacterProcessing {
 		}
 
 		return histogram;
-
 	}
 
 	private static BufferedImage toGray(BufferedImage original) {
-
 		int alpha, red, green, blue;
 		int newPixel;
 
@@ -251,11 +218,9 @@ public class CharacterProcessing {
 		}
 
 		return lum;
-
 	}
 
 	private static int otsuTreshold(BufferedImage original) {
-
 		int[] histogram = imageHistogram(original);
 		int total = original.getHeight() * original.getWidth();
 
@@ -289,17 +254,13 @@ public class CharacterProcessing {
 		}
 
 		return threshold;
-
 	}
 
 	private static BufferedImage binarize(BufferedImage original) {
-
 		int red;
 		int newPixel;
 
 		int threshold = otsuTreshold(original);
-
-		//System.out.printf("threshold: %s\n", threshold);
 
 		BufferedImage binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
 
@@ -319,13 +280,10 @@ public class CharacterProcessing {
 
 			}
 		}
-
 		return binarized;
-
 	}
 
 	private static int colorToRGB(int alpha, int red, int green, int blue) {
-
 		int newPixel = 0;
 		newPixel += alpha;
 		newPixel = newPixel << 8;

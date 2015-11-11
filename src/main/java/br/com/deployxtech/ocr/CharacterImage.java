@@ -30,7 +30,7 @@ public class CharacterImage implements Serializable {
 	private double proximidade;
 
 	private char character;
-	
+
 	private boolean isLineBreak;
 
 	public char getCharacter() {
@@ -95,7 +95,7 @@ public class CharacterImage implements Serializable {
 		return (positions.size()/2) > character.positions.size()
 				&& character.initWidth >= initWidth && character.width <= width
 				&& ((space1 >= 0 && space1 < getHeight()/2)
-				|| (space2 >= 0 && space2 < getHeight()/2));
+						|| (space2 >= 0 && space2 < getHeight()/2));
 	}
 
 	public boolean isSelf(CharacterImage character) {
@@ -145,33 +145,8 @@ public class CharacterImage implements Serializable {
 		}
 
 		proximidade = ((proximidade*2)/(positionsScale.size()+outerPositions.size()))*100;
-		
-		image = null;
-	}
-	
-	public void analisarProximidade2(CharacterImage outer) {
-		proximidade = 0;
-		newImageResize(outer.getWidth(), outer.getHeight());
-		List<Position> outerPositions = outer.getPositionScale();
-		List<Position> positionsScale = getPositionScale();
-		for (Position pScale: positionsScale) {
-			if (outerPositions.contains(pScale)) {
-				proximidade++;
-			}
-			else {
-				proximidade--;
-			}
-		}
-		for (Position pScale: outerPositions) {
-			if (positionsScale.contains(pScale)) {
-				proximidade++;
-			}
-			else {
-				proximidade--;
-			}
-		}
 
-		proximidade = ((proximidade)/(positionsScale.size()+outerPositions.size()))*100;
+		image = null;
 	}
 
 	public BufferedImage newImageScale(int scale) {

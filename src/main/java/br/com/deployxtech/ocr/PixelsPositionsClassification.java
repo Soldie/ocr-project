@@ -6,7 +6,7 @@ package br.com.deployxtech.ocr;
 import java.util.List;
 
 /**
- * @author francisco
+ * @author Francisco Silva
  *
  */
 public class PixelsPositionsClassification implements Classification {
@@ -27,14 +27,14 @@ public class PixelsPositionsClassification implements Classification {
 			if (bestCandidate == null || (bestCandidate.getProximidade() < charAnalyze.getProximidade())) {
 				bestCandidate = charAnalyze;
 			}
-			
+
 			if (bestCandidate.getProximidade() > averageProximity) {
 				break;
 			}
 		}
-		
+
 		averageProximity = (averageProximity+bestCandidate.getProximidade())/2;
-		
+
 		if (this.characters.remove(bestCandidate)) {
 			this.characters.add(0,bestCandidate);
 		}

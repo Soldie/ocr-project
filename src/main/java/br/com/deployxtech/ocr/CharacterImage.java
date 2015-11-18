@@ -135,7 +135,27 @@ public class CharacterImage implements Serializable {
 
 	public void analisarProximidade(CharacterImage outer) {
 		proximidade = 0;
+		if (outer.image == null) {
+			outer.newImage();
+		}
 		newImageResize(outer.getWidth(), outer.getHeight());
+		List<Position> outerPositions = outer.getPositionScale();
+		List<Position> positionsScale = getPositionScale();
+		for (Position pScale: positionsScale) {
+			if (outerPositions.contains(pScale)) {
+				proximidade++;
+			}
+		}
+
+		proximidade = ((proximidade*2)/(positionsScale.size()+outerPositions.size()))*100;
+
+		image = null;
+	}
+
+	public void analisarProximidade2(CharacterImage outer) {
+		proximidade = 0;
+		newImage();
+		outer.newImageResize(getWidth(), getHeight());
 		List<Position> outerPositions = outer.getPositionScale();
 		List<Position> positionsScale = getPositionScale();
 		for (Position pScale: positionsScale) {

@@ -13,6 +13,7 @@ public class PixelsPositionsClassification implements Classification {
 
 	private List<CharacterImage> characters;
 	private double averageProximity = 100d;
+	private int averageQt = 0;
 
 	public PixelsPositionsClassification(List<CharacterImage> characters) {
 		this.characters = characters;
@@ -20,25 +21,29 @@ public class PixelsPositionsClassification implements Classification {
 
 	@Override
 	public CharacterImage analyze(CharacterImage character) {
-		character.newImage();
+		int qt = 0;
+		int qtCandidate = 0;
 		CharacterImage bestCandidate = null;
 		for (CharacterImage charAnalyze: characters) {
-			charAnalyze.analisarProximidade(character);
+			qt++;
+			charAnalyze.analisarProximidade2(character);
 			if (bestCandidate == null || (bestCandidate.getProximidade() < charAnalyze.getProximidade())) {
 				bestCandidate = charAnalyze;
+				qtCandidate = qt;
 			}
 
-			if (bestCandidate.getProximidade() > averageProximity) {
+			if (bestCandidate.getProximidade() > averageProximity && qt > averageQt) {
 				break;
 			}
 		}
 
 		averageProximity = (averageProximity+bestCandidate.getProximidade())/2;
+		averageQt = (averageQt+qtCandidate)/2;
 
 		if (this.characters.remove(bestCandidate)) {
 			this.characters.add(0,bestCandidate);
 		}
-
+		
 		return bestCandidate;
 	}
 
